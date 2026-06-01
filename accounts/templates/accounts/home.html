@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Главная</title>
+    <style>
+        body { font-family: Arial; text-align: center; margin-top: 50px; }
+        .logout { padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .logout:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    <h1>Главная страница</h1>
+    <p>Добро пожаловать, <strong>{{ user.username }}</strong>!</p>
+    <p>Email: {{ user.email }}</p>
+    
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="logout">Выйти</button>
+    </form>
+</body>
+</html>
