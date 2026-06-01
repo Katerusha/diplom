@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Напоминания | MoneyFlow{% endblock %}
+{% block page_title %}Напоминания{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <span class="text-muted">Не забывайте о важных датах</span>
+    <a href="{% url 'finance:reminder_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Добавить напоминание
+    </a>
+</div>
+
+{% if reminders %}
+<div class="row">
+    {% for r in reminders %}
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card shadow-sm h-100 {% if r.is_completed %}bg-light{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title mb-0 {% if r.is_completed %}text-muted text-decoration-line-through{% endif %}">
+                        {{ r.title }}
+                    </h6>
+                    {% if r.is_completed %}
+                    <span class="badge bg-success">Выполнено</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">Ожидает</span>
+                    {% endif %}
+                </div>
+                {% if r.message %}<p class="small text-muted mb-2">{{ r.message }}</p>{% endif %}
+                <div class="small text-muted mb-2">
+                    <i class="bi bi-calendar me-1"></i>{{ r.remind_date|date:'d.m.Y' }}
+                </div>
+                <div class="d-flex gap-1">
+                    <a href="{% url 'finance:reminder_update' r.pk %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'finance:reminder_delete' r.pk %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center text-muted py-5">
+    <i class="bi bi-bell display-3 d-block mb-3"></i>
+    Нет напоминаний.
+</div>
+{% endif %}
+{% endblock %}

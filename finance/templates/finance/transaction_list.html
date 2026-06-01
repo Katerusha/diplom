@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load finance_tags %}
+
+{% block title %}Транзакции | MoneyFlow{% endblock %}
+{% block page_title %}Транзакции{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="{% url 'finance:transaction_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Добавить транзакцию
+    </a>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">Тип</label>
+                <div class="btn-group w-100" role="group">
+                    <button type="submit" name="type" value="" class="btn btn-outline-secondary btn-sm {% if selected_type == '' %}active{% endif %}">Все</button>
+                    <button type="submit" name="type" value="income" class="btn btn-outline-success btn-sm {% if selected_type == 'income' %}active{% endif %}">Доходы</button>
+                    <button type="submit" name="type" value="expense" class="btn btn-outline-danger btn-sm {% if selected_type == 'expense' %}active{% endif %}">Расходы</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="filter-account" class="form-label small">Счёт</label>
+                <select name="account" id="filter-account" class="form-select form-select-sm">
+                    <option value="">Все</option>
+                    {% for acc in accounts %}
+                    <option value="{{ acc.pk }}" {% if selected_account == acc.pk|stringformat:'s' %}selected{% endif %}>{{ acc.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="bi bi-funnel me-1"></i>Фильтр
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'finance:transaction_list' %}" class="btn btn-outline-secondary btn-sm w-100">Сброс</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if transactions %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Дата</th>
+                <th>Счёт</th>
+                <th>Категория</th>
+                <th>Сумма</th>
+                <th>Описание</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for txn in transactions %}
+            <tr>
+                <td>{{ txn.date|date:'d.m.Y' }}</td>
+                <td>{{ txn.account.name }}</td>
+                <td>
+                    {% if txn.category %}
+                    <span class="badge {% if txn.type == 'income' %}bg-success{% else %}bg-danger{% endif %} bg-opacity-10 text-{% if txn.type == 'income' %}success{% else %}danger{% endif %}">
+                        {{ txn.category.name }}
+                    </span>
+                    {% else %}
+                    <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
+                <td class="fw-bold {% if txn.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                    {% if txn.type == 'income' %}+{% else %}-{% endif %}{{ txn.amount|spaced }}
+                </td>
+                <td class="text-muted">{{ txn.description|default:'—' }}</td>
+                <td>
+                    <div class="d-flex gap-1 justify-content-end">
+                        <a href="{% url 'finance:transaction_update' txn.pk %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'finance:transaction_delete' txn.pk %}" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?type={{ selected_type }}&account={{ selected_account }}&page=1">&laquo;</a></li>
+        <li class="page-item"><a class="page-link" href="?type={{ selected_type }}&account={{ selected_account }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?type={{ selected_type }}&account={{ selected_account }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
+        <li class="page-item"><a class="page-link" href="?type={{ selected_type }}&account={{ selected_account }}&page={{ page_obj.paginator.num_pages }}">&raquo;</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="text-center text-muted py-5">
+    <i class="bi bi-receipt display-3 d-block mb-3"></i>
+    Нет транзакций. Добавьте первую транзакцию, чтобы начать учёт.
+</div>
+{% endif %}
+{% endblock %}

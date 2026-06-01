@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление категории | MoneyFlow{% endblock %}
+{% block page_title %}Удаление категории{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-exclamation-triangle text-warning display-3 d-block mb-3"></i>
+                <h5>Вы уверены, что хотите удалить категорию «{{ category.name }}»?</h5>
+                <p class="text-danger small">Это действие нельзя отменить. Все подкатегории также будут удалены.</p>
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>Удалить
+                        </button>
+                        <a href="{% url 'finance:category_list' %}" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

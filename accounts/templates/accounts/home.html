@@ -1,21 +1,94 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Главная</title>
-    <style>
-        body { font-family: Arial; text-align: center; margin-top: 50px; }
-        .logout { padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        .logout:hover { background: #c82333; }
-    </style>
-</head>
-<body>
-    <h1>Главная страница</h1>
-    <p>Добро пожаловать, <strong>{{ user.username }}</strong>!</p>
-    <p>Email: {{ user.email }}</p>
-    
-    <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit" class="logout">Выйти</button>
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load finance_tags %}
+
+{% block title %}Главная | MoneyFlow{% endblock %}
+{% block page_title %}Главная{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card card-stats balance shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase">Общий баланс</div>
+                <div class="fs-3 fw-bold">{{ total_balance|spaced }} ₽</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card card-stats income shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase">Доходы за месяц</div>
+                <div class="fs-3 fw-bold text-success">+{{ monthly_income|spaced }} ₽</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card card-stats expense shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase">Расходы за месяц</div>
+                <div class="fs-3 fw-bold text-danger">-{{ monthly_expense|spaced }} ₽</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card card-stats shadow-sm h-100" style="border-left-color: #6f42c1;">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase">Счетов</div>
+                <div class="fs-3 fw-bold">{{ account_count }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Последние транзакции</span>
+                <a href="{% url 'finance:transaction_list' %}" class="btn btn-outline-primary btn-sm">Все транзакции</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Дата</th>
+                                <th>Счёт</th>
+                                <th>Категория</th>
+                                <th>Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for txn in recent_transactions %}
+                            <tr>
+                                <td>{{ txn.date|date:'d.m.Y' }}</td>
+                                <td>{{ txn.account.name }}</td>
+                                <td>
+                                    {% if txn.category %}
+                                    <span class="badge {% if txn.type == 'income' %}bg-success{% else %}bg-danger{% endif %} bg-opacity-10 text-{% if txn.type == 'income' %}success{% else %}danger{% endif %}">
+                                        {{ txn.category.name }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold {% if txn.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                    {% if txn.type == 'income' %}+{% else %}-{% endif %}{{ txn.amount|spaced }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-inbox display-3 d-block mb-3"></i>
+                    Нет транзакций. Добавьте первый счёт и категорию, чтобы начать учёт.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

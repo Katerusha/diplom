@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load finance_tags %}
+
+{% block title %}Регулярные платежи | MoneyFlow{% endblock %}
+{% block page_title %}Регулярные платежи{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <span class="text-muted">Периодические доходы и расходы</span>
+    <a href="{% url 'finance:recurring_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Добавить платёж
+    </a>
+</div>
+
+{% if payments %}
+<div class="row">
+    {% for p in payments %}
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title mb-0">{{ p.name }}</h6>
+                    {% if p.is_active %}
+                    <span class="badge bg-success">Активен</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Отключён</span>
+                    {% endif %}
+                </div>
+                <div class="fs-5 fw-bold {% if p.type == 'income' %}text-success{% else %}text-danger{% endif %} mb-2">
+                    {% if p.type == 'income' %}+{% else %}-{% endif %}{{ p.amount|spaced }} р.
+                </div>
+                <div class="small text-muted mb-1">
+                    <i class="bi bi-wallet2 me-1"></i>{{ p.account.name }}
+                    {% if p.category %}| {{ p.category.name }}{% endif %}
+                </div>
+                <div class="small text-muted mb-2">
+                    <i class="bi bi-calendar me-1"></i>{{ p.get_frequency_display }} | След.: {{ p.next_date|date:'d.m.Y' }}
+                </div>
+                <div class="d-flex gap-1">
+                    <a href="{% url 'finance:recurring_update' p.pk %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'finance:recurring_delete' p.pk %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center text-muted py-5">
+    <i class="bi bi-arrow-repeat display-3 d-block mb-3"></i>
+    Нет регулярных платежей.
+</div>
+{% endif %}
+{% endblock %}

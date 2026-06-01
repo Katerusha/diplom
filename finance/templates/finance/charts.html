@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Графики | MoneyFlow{% endblock %}
+{% block page_title %}Графики{% endblock %}
+
+{% block content %}
+{% if charts.bar %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-bar-chart me-2"></i>Доходы и расходы по месяцам
+            </div>
+            <div class="card-body">
+                {{ charts.bar|safe }}
+            </div>
+        </div>
+    </div>
+    {% if charts.pie %}
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-pie-chart me-2"></i>Структура расходов (текущий месяц)
+            </div>
+            <div class="card-body">
+                {{ charts.pie|safe }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if charts.line %}
+    <div class="col-lg-{% if charts.pie %}6{% else %}12{% endif %} mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-graph-up me-2"></i>Динамика баланса
+            </div>
+            <div class="card-body">
+                {{ charts.line|safe }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<div class="text-center text-muted py-5">
+    <i class="bi bi-graph-up display-3 d-block mb-3"></i>
+    Недостаточно данных для построения графиков. Добавьте транзакции.
+</div>
+{% endif %}
+{% endblock %}

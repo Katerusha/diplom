@@ -4,7 +4,8 @@ from accounts import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register/', include('accounts.urls')),
+    path('accounts/', include('accounts.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('', views.home, name='home'),  # ← теперь home существует!
+    path('finance/', include('finance.urls')),
+    path('', views.home, name='home'),
 ]

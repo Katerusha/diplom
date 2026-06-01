@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Категории | MoneyFlow{% endblock %}
+{% block page_title %}Категории{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <span class="text-muted">Управление категориями доходов и расходов</span>
+    <a href="{% url 'finance:category_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Добавить категорию
+    </a>
+</div>
+
+{% if categories %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success bg-opacity-10 fw-semibold">
+                <i class="bi bi-arrow-down-circle text-success me-2"></i>Доходы
+            </div>
+            <div class="card-body">
+                {% if income_categories %}
+                <ul class="list-group list-group-flush">
+                    {% for cat in income_categories %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            {{ cat.name }}
+                            {% if cat.parent %}<span class="text-muted small">← {{ cat.parent.name }}</span>{% endif %}
+                        </div>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'finance:category_update' cat.pk %}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'finance:category_delete' cat.pk %}" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted text-center mb-0">Нет категорий доходов</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-danger bg-opacity-10 fw-semibold">
+                <i class="bi bi-arrow-up-circle text-danger me-2"></i>Расходы
+            </div>
+            <div class="card-body">
+                {% if expense_categories %}
+                <ul class="list-group list-group-flush">
+                    {% for cat in expense_categories %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            {{ cat.name }}
+                            {% if cat.parent %}<span class="text-muted small">← {{ cat.parent.name }}</span>{% endif %}
+                        </div>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'finance:category_update' cat.pk %}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'finance:category_delete' cat.pk %}" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted text-center mb-0">Нет категорий расходов</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="text-center text-muted py-5">
+    <i class="bi bi-tags display-3 d-block mb-3"></i>
+    Нет категорий. Добавьте категории для учёта доходов и расходов.
+</div>
+{% endif %}
+{% endblock %}

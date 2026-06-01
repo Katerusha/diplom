@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load finance_tags %}
+
+{% block title %}Долги | MoneyFlow{% endblock %}
+{% block page_title %}Долги{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="text-muted">Кто кому должен</span>
+    <div class="d-flex gap-2">
+        <div class="btn-group" role="group">
+            <a href="{% url 'finance:debt_list' %}" class="btn btn-outline-primary btn-sm {% if active_tab == 'all' %}active{% endif %}">Все</a>
+            <a href="?tab=i_owe" class="btn btn-outline-danger btn-sm {% if active_tab == 'i_owe' %}active{% endif %}">Я должен</a>
+            <a href="?tab=owed_to_me" class="btn btn-outline-success btn-sm {% if active_tab == 'owed_to_me' %}active{% endif %}">Мне должны</a>
+        </div>
+        {% if active_tab != 'all' %}
+        <a href="{% url 'finance:debt_create' %}?type={{ active_tab }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>Добавить
+        </a>
+        {% else %}
+        <a href="{% url 'finance:debt_create' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>Добавить долг
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if debts %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Кредитор / должник</th>
+                <th>Сумма</th>
+                <th>Дата возврата</th>
+                <th>Статус</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in debts %}
+            <tr>
+                <td>{{ d.creditor_name }}</td>
+                <td class="fw-bold">{{ d.amount|spaced }} р.</td>
+                <td>{{ d.due_date|date:'d.m.Y' }}</td>
+                <td>
+                    {% if d.status == 'active' %}
+                    <span class="badge bg-primary">Активен</span>
+                    {% elif d.status == 'paid' %}
+                    <span class="badge bg-success">Погашен</span>
+                    {% else %}
+                    <span class="badge bg-danger">Просрочен</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="d-flex gap-1 justify-content-end">
+                        <a href="{% url 'finance:debt_update' d.pk %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'finance:debt_delete' d.pk %}" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center text-muted py-5">
+    <i class="bi bi-person-lines-fill display-3 d-block mb-3"></i>
+    {% if active_tab == 'i_owe' %}
+    Нет долгов, которые вы должны.
+    {% elif active_tab == 'owed_to_me' %}
+    Нет долгов, которые должны вам.
+    {% else %}
+    Нет долгов.
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
